@@ -1,11 +1,13 @@
 """Input and output checks that run outside the model."""
 import re
 
+# Patterns for personal data that should not be sent to the model or written to a ticket.
 PATTERNS = {
     "email": re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+"),
     "phone": re.compile(r"\b(?:\+?1[ -.]?)?\(?\d{3}\)?[ -.]?\d{3}[ -.]?\d{4}\b"),
     "card": re.compile(r"\b(?:\d[ -]?){13,16}\b"),
 }
+# Matches requests such as "tell me the password". These are refused outright.
 SECRET_REQUEST = re.compile(r"\b(what is|tell me|give me|share)\b.*\b(password|passcode|mfa code|one-time code)\b", re.I)
 
 

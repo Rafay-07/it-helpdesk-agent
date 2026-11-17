@@ -9,6 +9,8 @@ import tempfile
 
 from agent import HelpDeskAgent
 
+# Each case names the article the answer should cite and the ticket priority expected, if any.
+# The last case is off topic: the right behaviour is no citation and no ticket.
 CASES = [
     {"q": "How long does my new password need to be?", "source": "password-reset.md", "ticket": None},
     {"q": "My VPN says certificate expired, what do I do?", "source": "vpn.md", "ticket": None},
@@ -21,9 +23,11 @@ CASES = [
 def main():
     passed = 0
     for case in CASES:
+        # Each case gets its own empty ticket file, so cases cannot affect each other.
         tickets = os.path.join(tempfile.mkdtemp(), "tickets.json")
         agent = HelpDeskAgent(ticket_file=tickets)
         answer = agent.ask(case["q"])
+        # Pull the cited file names out of the answer, and the ticket priorities out of the tool trace.
         cited = re.findall(r"\[([\w-]+\.md)\]", answer)
         made = [t["input"]["priority"] for t in agent.trace if t["tool"] == "create_ticket"]
         ok_source = (case["source"] in cited) if case["source"] else not cited
